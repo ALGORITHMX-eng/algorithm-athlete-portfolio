@@ -1,0 +1,1015 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Algorithm Athlete — AI Automation Portfolio</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;700;800&family=JetBrains+Mono:wght@400;700&family=Instrument+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0a0a0a;
+    --surface: #111111;
+    --card: #161616;
+    --border: #222222;
+    --accent1: #00ff88;
+    --accent2: #ff6b35;
+    --accent3: #3d9fff;
+    --text: #f0f0f0;
+    --muted: #666666;
+    --mono: 'JetBrains Mono', monospace;
+    --display: 'Syne', sans-serif;
+    --body: 'Instrument Sans', sans-serif;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--body);
+    overflow-x: hidden;
+  }
+
+  /* NOISE TEXTURE */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+    pointer-events: none;
+    z-index: 1000;
+    opacity: 0.4;
+  }
+
+  /* HERO */
+  .hero {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: 80px 48px;
+    position: relative;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .hero::after {
+    content: '';
+    position: absolute;
+    top: -200px;
+    right: -200px;
+    width: 600px;
+    height: 600px;
+    background: radial-gradient(circle, rgba(0,255,136,0.06) 0%, transparent 70%);
+    pointer-events: none;
+  }
+
+  .tag {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--accent1);
+    text-transform: uppercase;
+    letter-spacing: 3px;
+    margin-bottom: 32px;
+  }
+
+  .tag::before {
+    content: '';
+    width: 24px;
+    height: 1px;
+    background: var(--accent1);
+  }
+
+  h1 {
+    font-family: var(--display);
+    font-size: clamp(52px, 8vw, 96px);
+    font-weight: 800;
+    line-height: 0.95;
+    letter-spacing: -3px;
+    margin-bottom: 32px;
+  }
+
+  h1 .line2 {
+    color: transparent;
+    -webkit-text-stroke: 1px rgba(240,240,240,0.3);
+  }
+
+  h1 .accent {
+    color: var(--accent1);
+  }
+
+  .hero-desc {
+    font-size: 18px;
+    color: var(--muted);
+    max-width: 560px;
+    line-height: 1.7;
+    margin-bottom: 48px;
+  }
+
+  .hero-stats {
+    display: flex;
+    gap: 48px;
+    flex-wrap: wrap;
+  }
+
+  .stat {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  .stat-num {
+    font-family: var(--display);
+    font-size: 36px;
+    font-weight: 800;
+    color: var(--accent1);
+  }
+
+  .stat-label {
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 2px;
+  }
+
+  .scroll-hint {
+    position: absolute;
+    bottom: 40px;
+    left: 48px;
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--muted);
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    animation: bounce 2s infinite;
+  }
+
+  @keyframes bounce {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(6px); }
+  }
+
+  /* SECTION */
+  section {
+    padding: 80px 48px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .section-label {
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 3px;
+    margin-bottom: 16px;
+  }
+
+  .section-title {
+    font-family: var(--display);
+    font-size: clamp(28px, 4vw, 48px);
+    font-weight: 800;
+    letter-spacing: -1px;
+    margin-bottom: 64px;
+  }
+
+  /* SYSTEMS */
+  .systems {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+
+  .system-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    overflow: hidden;
+    transition: border-color 0.3s;
+  }
+
+  .system-card:hover {
+    border-color: #333;
+  }
+
+  .system-header {
+    display: grid;
+    grid-template-columns: 80px 1fr auto;
+    align-items: center;
+    padding: 32px 40px;
+    gap: 32px;
+    cursor: pointer;
+  }
+
+  .system-num {
+    font-family: var(--display);
+    font-size: 56px;
+    font-weight: 800;
+    color: var(--border);
+    line-height: 1;
+  }
+
+  .system-card:hover .system-num,
+  .system-card.active .system-num {
+    color: var(--accent1);
+    transition: color 0.3s;
+  }
+
+  .system-info h3 {
+    font-family: var(--display);
+    font-size: 22px;
+    font-weight: 700;
+    margin-bottom: 8px;
+  }
+
+  .system-flow {
+    font-family: var(--mono);
+    font-size: 12px;
+    color: var(--muted);
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    flex-wrap: wrap;
+  }
+
+  .flow-node {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    padding: 3px 10px;
+    border-radius: 3px;
+    color: var(--text);
+  }
+
+  .flow-arrow {
+    color: var(--accent1);
+  }
+
+  .system-badge {
+    font-family: var(--mono);
+    font-size: 10px;
+    padding: 6px 14px;
+    border-radius: 3px;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    white-space: nowrap;
+  }
+
+  .badge-monitored { background: rgba(255,107,53,0.1); color: var(--accent2); border: 1px solid rgba(255,107,53,0.3); animation: pulse-badge 2s infinite; }
+
+  @keyframes pulse-badge {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.6; }
+  }
+
+  .system-body {
+    display: none;
+    padding: 0 40px 40px;
+    border-top: 1px solid var(--border);
+  }
+
+  .system-card.active .system-body {
+    display: block;
+  }
+
+  .system-body-inner {
+    padding-top: 40px;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 32px;
+  }
+
+  .proof-block h4 {
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    margin-bottom: 16px;
+  }
+
+  .proof-img {
+    width: 100%;
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    background: var(--surface);
+    overflow: hidden;
+  }
+
+  .proof-img img {
+    width: 100%;
+    display: block;
+  }
+
+  /* MOCK SCREENSHOTS */
+  .mock-email {
+    background: #0d1117;
+    border: 1px solid #30363d;
+    border-radius: 6px;
+    padding: 20px;
+    font-family: var(--mono);
+    font-size: 13px;
+  }
+
+  .mock-email .subject {
+    color: #f0f0f0;
+    font-size: 16px;
+    font-weight: 700;
+    margin-bottom: 4px;
+  }
+
+  .mock-email .meta {
+    color: #666;
+    font-size: 11px;
+    margin-bottom: 16px;
+    padding-bottom: 16px;
+    border-bottom: 1px solid #30363d;
+  }
+
+  .mock-email .body { color: #c9d1d9; line-height: 1.8; }
+  .mock-email .body strong { color: #f0f0f0; }
+  .mock-email .fire { color: #ff6b35; }
+
+  .mock-sheet {
+    background: #0d1117;
+    border: 1px solid #30363d;
+    border-radius: 6px;
+    overflow: hidden;
+    font-family: var(--mono);
+    font-size: 11px;
+  }
+
+  .sheet-header {
+    background: #161b22;
+    padding: 8px 12px;
+    color: #58a6ff;
+    border-bottom: 1px solid #30363d;
+  }
+
+  .sheet-row {
+    display: grid;
+    grid-template-columns: 80px 100px 1fr 80px;
+    padding: 6px 12px;
+    border-bottom: 1px solid #1c2128;
+    color: #c9d1d9;
+    align-items: center;
+  }
+
+  .sheet-row.head { background: #161b22; color: #8b949e; }
+  .sheet-row .hot { color: var(--accent1); }
+
+  .mock-slack {
+    background: #1a1d21;
+    border: 1px solid #2d2d2d;
+    border-radius: 6px;
+    padding: 16px;
+    font-size: 14px;
+  }
+
+  .slack-meta {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 12px;
+  }
+
+  .slack-avatar {
+    width: 36px;
+    height: 36px;
+    background: #4a154b;
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 16px;
+  }
+
+  .slack-sender { font-weight: 700; color: #fff; }
+  .slack-time { color: #666; font-size: 11px; }
+
+  .slack-msg { color: #d1d2d3; line-height: 1.7; }
+  .slack-msg .alert-title { font-size: 16px; font-weight: 700; color: #ff6b35; margin-bottom: 8px; }
+  .slack-msg .field { color: #9d9d9d; }
+  .slack-msg .value { color: #d1d2d3; }
+
+  .mock-supabase {
+    background: #0d1117;
+    border: 1px solid #30363d;
+    border-radius: 6px;
+    overflow: hidden;
+    font-family: var(--mono);
+    font-size: 11px;
+  }
+
+  .sb-header {
+    background: #161b22;
+    padding: 8px 12px;
+    color: #3ecf8e;
+    border-bottom: 1px solid #30363d;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .sb-row {
+    display: grid;
+    grid-template-columns: 30px 80px 90px 1fr 60px;
+    padding: 6px 12px;
+    border-bottom: 1px solid #1c2128;
+    color: #c9d1d9;
+    font-size: 10px;
+    align-items: center;
+  }
+
+  .sb-row.head { background: #161b22; color: #8b949e; }
+  .sb-open { color: #ff6b35; }
+
+  .mock-botpress {
+    background: #0f0f0f;
+    border: 1px solid #222;
+    border-radius: 12px;
+    overflow: hidden;
+    font-size: 13px;
+  }
+
+  .bp-header {
+    background: #161616;
+    padding: 12px 16px;
+    color: #fff;
+    font-weight: 700;
+    border-bottom: 1px solid #222;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .bp-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--accent1); }
+
+  .bp-messages {
+    padding: 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .bp-msg {
+    max-width: 85%;
+    padding: 10px 14px;
+    border-radius: 12px;
+    line-height: 1.5;
+  }
+
+  .bp-bot {
+    background: #1e1e1e;
+    color: #e0e0e0;
+    border-radius: 4px 12px 12px 12px;
+    align-self: flex-start;
+  }
+
+  .bp-user {
+    background: var(--accent3);
+    color: #fff;
+    border-radius: 12px 4px 12px 12px;
+    align-self: flex-end;
+  }
+
+  .bp-result {
+    background: #1a2a1a;
+    border: 1px solid rgba(0,255,136,0.2);
+    color: var(--accent1);
+    font-family: var(--mono);
+    font-size: 12px;
+    border-radius: 4px 12px 12px 12px;
+    align-self: flex-start;
+  }
+
+  /* LIVE DEMO SECTION */
+  .demo-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 32px;
+  }
+
+  .demo-card {
+    border: 1px solid var(--border);
+    background: var(--card);
+    overflow: hidden;
+  }
+
+  .demo-card-header {
+    padding: 20px 24px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .demo-card-header h3 {
+    font-family: var(--display);
+    font-size: 16px;
+    font-weight: 700;
+  }
+
+  .demo-card-body {
+    height: 500px;
+    overflow: hidden;
+  }
+
+  .demo-card-body iframe {
+    width: 100%;
+    height: 100%;
+    border: none;
+    background: #fff;
+  }
+
+  /* STACK */
+  .stack-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+    gap: 2px;
+  }
+
+  .stack-item {
+    background: var(--card);
+    border: 1px solid var(--border);
+    padding: 24px 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    transition: background 0.2s;
+  }
+
+  .stack-item:hover { background: #1c1c1c; }
+
+  .stack-icon { font-size: 24px; }
+
+  .stack-name {
+    font-family: var(--mono);
+    font-size: 12px;
+    color: var(--text);
+    font-weight: 700;
+  }
+
+  .stack-role {
+    font-size: 11px;
+    color: var(--muted);
+  }
+
+  /* FOOTER */
+  footer {
+    padding: 48px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: gap;
+  }
+
+  .footer-brand {
+    font-family: var(--display);
+    font-size: 20px;
+    font-weight: 800;
+  }
+
+  .footer-brand span { color: var(--accent1); }
+
+  .footer-links {
+    display: flex;
+    gap: 32px;
+  }
+
+  .footer-links a {
+    font-family: var(--mono);
+    font-size: 12px;
+    color: var(--muted);
+    text-decoration: none;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    transition: color 0.2s;
+  }
+
+  .footer-links a:hover { color: var(--accent1); }
+
+  /* TOGGLE CHEVRON */
+  .chevron {
+    color: var(--muted);
+    transition: transform 0.3s;
+    font-size: 20px;
+  }
+
+  .system-card.active .chevron { transform: rotate(180deg); color: var(--accent1); }
+
+  /* ANIMATE IN */
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(24px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .hero > * {
+    animation: fadeUp 0.8s ease forwards;
+    opacity: 0;
+  }
+
+  .hero .tag { animation-delay: 0.1s; }
+  .hero h1 { animation-delay: 0.2s; }
+  .hero .hero-desc { animation-delay: 0.3s; }
+  .hero .hero-stats { animation-delay: 0.4s; }
+  .hero .scroll-hint { animation-delay: 0.6s; }
+
+  /* MOBILE */
+  @media (max-width: 768px) {
+    .hero, section { padding: 48px 20px; }
+    footer { padding: 40px 20px; flex-direction: column; gap: 24px; align-items: flex-start; }
+
+    h1 { font-size: 42px; letter-spacing: -2px; }
+
+    .hero-desc { font-size: 15px; }
+
+    .hero-stats { gap: 24px; flex-wrap: wrap; }
+    .stat-num { font-size: 28px; }
+
+    .system-header {
+      grid-template-columns: 40px 1fr;
+      gap: 12px;
+      padding: 20px;
+    }
+    .system-num { font-size: 32px; }
+    .system-badge { display: none; }
+    .chevron { font-size: 16px; }
+
+    .system-info h3 { font-size: 16px; }
+
+    .system-flow {
+      display: none;
+    }
+
+    .system-body { padding: 0 20px 24px; }
+    .system-body-inner { grid-template-columns: 1fr; gap: 20px; }
+
+    .demo-grid { grid-template-columns: 1fr; }
+    .demo-card-body { height: 420px; }
+
+    .stack-grid { grid-template-columns: repeat(auto-fill, minmax(110px, 1fr)); }
+    .stack-item { padding: 16px 14px; }
+
+    .section-title { font-size: 28px; margin-bottom: 40px; }
+
+    .mock-email, .mock-sheet, .mock-slack, .mock-supabase, .mock-botpress {
+      font-size: 12px;
+    }
+
+    .footer-links { flex-wrap: wrap; gap: 20px; }
+
+    /* fix overflow on flow nodes */
+    .system-flow { flex-wrap: wrap; gap: 4px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="tag">Algorithm Athlete · AI Automation</div>
+  <h1>
+    I Build Systems<br>
+    <span class="line2">That Work</span><br>
+    <span class="accent">While You Sleep.</span>
+  </h1>
+  <p class="hero-desc">
+    AI-powered automation workflows that qualify leads, analyze investments, and resolve SaaS incidents — fully autonomous pipelines that reduce operational overhead by 80% and capture leads in &lt; 2 minutes.
+  </p>
+  <div class="hero-stats">
+    <div class="stat">
+      <span class="stat-num">3</span>
+      <span class="stat-label">Live Systems</span>
+    </div>
+    <div class="stat">
+      <span class="stat-num">8+</span>
+      <span class="stat-label">Tools Integrated</span>
+    </div>
+    <div class="stat">
+      <span class="stat-num">100%</span>
+      <span class="stat-label">Autonomous</span>
+    </div>
+  </div>
+  <div style="margin-top:24px;display:inline-flex;align-items:center;gap:10px;font-family:var(--mono);font-size:11px;color:var(--muted);border:1px solid var(--border);padding:10px 18px;border-radius:3px;background:var(--surface)">
+    <span style="color:var(--accent1)">✓</span> Built with redundant error-handling and real-time incident monitoring
+  </div>
+  <div class="scroll-hint">↓ &nbsp; View Systems</div>
+</section>
+
+<!-- SYSTEMS -->
+<section>
+  <div class="section-label">Portfolio</div>
+  <div class="section-title">Three Systems. Real Proof.</div>
+
+  <div class="systems">
+
+    <!-- SYSTEM 1 -->
+    <div class="system-card active" onclick="toggle(this)">
+      <div class="system-header">
+        <div class="system-num">01</div>
+        <div class="system-info">
+          <h3>Lead Qualification Engine</h3>
+          <div class="system-flow">
+            <span class="flow-node">High-Intent Capture</span>
+            <span class="flow-arrow">→</span>
+            <span class="flow-node">Logic Filtering</span>
+            <span class="flow-arrow">→</span>
+            <span class="flow-node">Real-time Stakeholder Alert</span>
+          </div>
+        </div>
+        <div style="display:flex;align-items:center;gap:16px">
+          <span class="system-badge badge-live">✓ Working</span>
+          <span class="chevron">▾</span>
+        </div>
+      </div>
+      <div class="system-body">
+        <div class="system-body-inner">
+          <div class="proof-block">
+            <h4>🔥 HOT Lead — Gmail Alert</h4>
+            <div class="mock-email">
+              <div class="subject"><span class="fire">🔥</span> HOT Lead Alert — $2000+ Budget</div>
+              <div class="meta">OLALERE Jo... · Mar 18 · to me</div>
+              <div class="body">
+                <strong>Name:</strong> Johnson<br>
+                <strong>Email:</strong> <a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="dcb3b0bdb0b9aeb9bdb8b9b7a9b2b0b9eeecece49cbbb1bdb5b0f2bfb3b1">[email&#160;protected]</a><br>
+                <strong>Company:</strong> ALGOSMART<br>
+                <strong>Budget:</strong> $2000+<br>
+                <strong>Service:</strong> Lead Generation<br><br>
+                Follow up immediately!
+              </div>
+            </div>
+          </div>
+          <div class="proof-block">
+            <h4>📊 Google Sheets — All Leads Logged</h4>
+            <div class="mock-sheet">
+              <div class="sheet-header">📄 Lead Generation Sheet</div>
+              <div class="sheet-row head">
+                <span>Name</span><span>Budget</span><span>Service</span><span>Score</span>
+              </div>
+              <div class="sheet-row">
+                <span>Johnson</span><span class="hot">$2000+</span><span>Lead Gen</span><span class="hot">HOT</span>
+              </div>
+              <div class="sheet-row">
+                <span>Johnson</span><span class="hot">$2000+</span><span>Lead Gen</span><span style="color:var(--muted)">pending</span>
+              </div>
+            </div>
+            <div style="margin-top:12px;font-family:var(--mono);font-size:11px;color:var(--muted)">
+              ✓ Logs Name, Email, Company, Budget, Service, Score, Timestamp
+            </div>
+          </div>
+        </div>
+        <div style="margin-top:24px;padding:20px;background:var(--surface);border:1px solid var(--border);border-radius:4px">
+          <div style="font-family:var(--mono);font-size:11px;color:var(--muted);margin-bottom:8px">WHAT IT DOES</div>
+          <p style="color:#aaa;line-height:1.7;font-size:14px">When a prospect fills the Tally form, Make.com scores them instantly. HOT leads ($2000+ budget) trigger an immediate Gmail alert so you follow up before they go cold. Every submission is logged to Google Sheets with timestamp.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- SYSTEM 2 -->
+    <div class="system-card" onclick="toggle(this)">
+      <div class="system-header">
+        <div class="system-num">02</div>
+        <div class="system-info">
+          <h3>Real Estate ROI Scout</h3>
+          <div class="system-flow">
+            <span class="flow-node">Agentic Interface</span>
+            <span class="flow-arrow">→</span>
+            <span class="flow-node">ROI Projections</span>
+            <span class="flow-arrow">→</span>
+            <span class="flow-node">CRM Data Synchronization</span>
+          </div>
+        </div>
+        <div style="display:flex;align-items:center;gap:16px">
+          <span class="system-badge badge-working">✓ Working</span>
+          <span class="chevron">▾</span>
+        </div>
+      </div>
+      <div class="system-body">
+        <div class="system-body-inner">
+          <div class="proof-block">
+            <h4>💬 Botpress Conversation (Desktop)</h4>
+            <div class="mock-botpress">
+              <div class="bp-header"><div class="bp-dot"></div> ROI SCOUT</div>
+              <div class="bp-messages">
+                <div class="bp-msg bp-bot">Welcome to ROI Scout 🏠 Which currency? Naira (₦) or Dollars ($)</div>
+                <div class="bp-msg bp-user">$</div>
+                <div class="bp-msg bp-bot">What's the asking price? (numbers only)</div>
+                <div class="bp-msg bp-user">5000000</div>
+                <div class="bp-msg bp-bot">What's the expected monthly rent?</div>
+                <div class="bp-msg bp-user">80000</div>
+                <div class="bp-msg bp-bot">Monthly expenses?</div>
+                <div class="bp-msg bp-user">15000</div>
+                <div class="bp-msg bp-bot">Down payment amount?</div>
+                <div class="bp-msg bp-user">1000000</div>
+                <div class="bp-msg bp-result">📊 ROI ANALYSIS RESULTS<br>💰 Monthly Cash Flow: $65,000.00<br>📈 Annual ROI: 15.60%<br>🏢 Cap Rate: 15.60%<br><br>Your analysis has been saved automatically.<br><br>Built by Algorithm Athlete ⚡</div>
+              </div>
+            </div>
+          </div>
+          <div class="proof-block">
+            <h4>📊 Google Sheets — Auto Logged</h4>
+            <div class="mock-sheet">
+              <div class="sheet-header">📄 ROI SCOUT</div>
+              <div class="sheet-row head">
+                <span>Currency</span><span>Price</span><span>ROI</span><span>Cash Flow</span>
+              </div>
+              <div class="sheet-row">
+                <span>$</span><span>5,000,000</span><span class="hot">15.6%</span><span class="hot">$65,000</span>
+              </div>
+              <div class="sheet-row">
+                <span>$</span><span>3,000,000</span><span class="hot">120%</span><span class="hot">$300k</span>
+              </div>
+              <div class="sheet-row">
+                <span>₦</span><span>50,000,000</span><span style="color:var(--accent3)">24%</span><span style="color:var(--accent3)">₦1M</span>
+              </div>
+            </div>
+            <div style="margin-top:12px;font-family:var(--mono);font-size:11px;color:var(--muted)">
+              ✓ Works in Naira & Dollars · Logs all analyses with timestamp
+            </div>
+          </div>
+        </div>
+        <div style="margin-top:24px;padding:20px;background:var(--surface);border:1px solid var(--border);border-radius:4px">
+          <div style="font-family:var(--mono);font-size:11px;color:var(--muted);margin-bottom:8px">WHAT IT DOES</div>
+          <p style="color:#aaa;line-height:1.7;font-size:14px">Real estate investors chat with the bot, enter their property figures, and get instant ROI, Cash Flow, and Cap Rate calculations. Every analysis is automatically saved to Google Sheets. Works in both Naira and Dollars.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- SYSTEM 3 -->
+    <div class="system-card" onclick="toggle(this)">
+      <div class="system-header">
+        <div class="system-num">03</div>
+        <div class="system-info">
+          <h3>SaaS Operational Hub</h3>
+          <div class="system-flow">
+            <span class="flow-node">Incident Webhook</span>
+            <span class="flow-arrow">→</span>
+            <span class="flow-node">Secure Data Persistence</span>
+            <span class="flow-arrow">→</span>
+            <span class="flow-node">Groq LLM Diagnostics</span>
+            <span class="flow-arrow">→</span>
+            <span class="flow-node">Slack Alert</span>
+          </div>
+        </div>
+        <div style="display:flex;align-items:center;gap:16px">
+          <span class="system-badge badge-monitored">● MONITORED</span>
+          <span class="chevron">▾</span>
+        </div>
+      </div>
+      <div class="system-body">
+        <div style="padding-top:24px;padding-bottom:0;display:flex;gap:12px;flex-wrap:wrap">
+          <span style="font-family:var(--mono);font-size:11px;background:rgba(255,107,53,0.1);border:1px solid rgba(255,107,53,0.3);color:#ff6b35;padding:6px 14px;border-radius:3px">⚡ System Status: LIVE Since Launch</span>
+          <span style="font-family:var(--mono);font-size:11px;background:rgba(0,255,136,0.1);border:1px solid rgba(0,255,136,0.2);color:var(--accent1);padding:6px 14px;border-radius:3px">✓ 99.9% Uptime</span>
+          <span style="font-family:var(--mono);font-size:11px;background:rgba(61,159,255,0.1);border:1px solid rgba(61,159,255,0.2);color:var(--accent3);padding:6px 14px;border-radius:3px">🔴 Real-time Monitoring Active</span>
+        </div>
+        <div class="system-body-inner">
+          <div class="proof-block">
+            <h4>🚨 Slack — AI Incident Alert</h4>
+            <div class="mock-slack">
+              <div class="slack-meta">
+                <div class="slack-avatar">M</div>
+                <div>
+                  <div class="slack-sender">Make APP <span style="color:#666;font-weight:400;font-size:12px">2:57 AM</span></div>
+                </div>
+              </div>
+              <div class="slack-msg">
+                <div class="alert-title">🚨 INCIDENT ALERT</div>
+                🔍 <span class="field">Issue:</span> <span class="value">Webhook connection timed out due to prolonged idle or server unavailability</span><br><br>
+                🔧 <span class="field">AI Fix:</span> <span class="value">Verify the webhook URL, ensure that the destination server is up and running, increase the timeout value or use persistent connections to avoid frequent timeouts</span><br><br>
+                <span style="color:#666">Status: OPEN</span><br>
+                <span style="color:#666">Logged by: Algorithm Athlete SaaS Hub ⚡</span>
+              </div>
+            </div>
+          </div>
+          <div class="proof-block">
+            <h4>🗄️ Supabase — Incidents Table</h4>
+            <div class="mock-supabase">
+              <div class="sb-header">⚡ incidents · 18 records</div>
+              <div class="sb-row head">
+                <span>id</span><span>error_code</span><span>created_at</span><span>description</span><span>status</span>
+              </div>
+              <div class="sb-row">
+                <span style="color:var(--muted)">1</span><span style="color:var(--accent3)">ERR_001</span><span style="color:var(--muted)">2026-03-19</span><span>Webhook timed out...</span><span class="sb-open">open</span>
+              </div>
+              <div class="sb-row">
+                <span style="color:var(--muted)">12</span><span style="color:var(--accent3)">ERR_001</span><span style="color:var(--muted)">2026-03-19</span><span>DB connection refused...</span><span class="sb-open">open</span>
+              </div>
+              <div class="sb-row">
+                <span style="color:var(--muted)">18</span><span style="color:var(--accent3)">ERR_001</span><span style="color:var(--muted)">2026-03-19</span><span>Webhook timed out...</span><span class="sb-open">open</span>
+              </div>
+            </div>
+            <div style="margin-top:12px;font-family:var(--mono);font-size:11px;color:var(--muted)">
+              ✓ Every incident logged with error code, description & AI fix
+            </div>
+          </div>
+        </div>
+        <div style="margin-top:24px;padding:20px;background:var(--surface);border:1px solid var(--border);border-radius:4px">
+          <div style="font-family:var(--mono);font-size:11px;color:var(--muted);margin-bottom:8px">WHAT IT DOES</div>
+          <p style="color:#aaa;line-height:1.7;font-size:14px">When a SaaS system throws an error, the webhook fires. Make.com logs it to Supabase, then Groq AI analyzes the error and generates a specific fix suggestion. Slack receives the full incident alert with the AI-generated fix — zero human involvement required.</p>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- LIVE DEMOS -->
+<section>
+  <div class="section-label">Interactive</div>
+  <div class="section-title">Try It Live.</div>
+  <div class="demo-grid">
+    <div class="demo-card">
+      <div class="demo-card-header">
+        <h3>🤖 ROI Scout — Botpress AI</h3>
+        <span class="system-badge badge-live">Live</span>
+      </div>
+      <div class="demo-card-body">
+        <iframe src="https://cdn.botpress.cloud/webchat/v3.6/shareable.html?configUrl=https://files.bpcontent.cloud/2026/03/18/01/20260318015400-ZBCCYMVQ.json" allow="microphone"></iframe>
+      </div>
+    </div>
+    <div class="demo-card">
+      <div class="demo-card-header">
+        <h3>📋 Lead Qualification — Tally Form</h3>
+        <span class="system-badge badge-live">Live</span>
+      </div>
+      <div class="demo-card-body">
+        <iframe src="https://tally.so/embed/xXZZzk?alignLeft=1&hideTitle=1&transparentBackground=1&dynamicHeight=1" loading="lazy" style="background:#fff"></iframe>
+      </div>
+    </div>
+  </div>
+  <p style="margin-top:16px;font-family:var(--mono);font-size:11px;color:var(--muted)">
+    ↑ These are real, live systems. The bot logs to Google Sheets. The form triggers Make.com automation.
+  </p>
+</section>
+
+<!-- STACK -->
+<section>
+  <div class="section-label">Tech Stack</div>
+  <div class="section-title">Tools I Work With.</div>
+  <div class="stack-grid">
+    <div class="stack-item">
+      <div class="stack-icon">⚡</div>
+      <div class="stack-name">Make.com</div>
+      <div class="stack-role">Workflow Orchestration</div>
+    </div>
+    <div class="stack-item">
+      <div class="stack-icon">🤖</div>
+      <div class="stack-name">Botpress</div>
+      <div class="stack-role">AI chatbots</div>
+    </div>
+    <div class="stack-item">
+      <div class="stack-icon">📋</div>
+      <div class="stack-name">Tally</div>
+      <div class="stack-role">Smart forms</div>
+    </div>
+    <div class="stack-item">
+      <div class="stack-icon">🗄️</div>
+      <div class="stack-name">Supabase</div>
+      <div class="stack-role">Secure Data Persistence</div>
+    </div>
+    <div class="stack-item">
+      <div class="stack-icon">🧠</div>
+      <div class="stack-name">Groq AI</div>
+      <div class="stack-role">High-Speed Edge Inference</div>
+    </div>
+    <div class="stack-item">
+      <div class="stack-icon">💬</div>
+      <div class="stack-name">Slack</div>
+      <div class="stack-role">Alerts & notifications</div>
+    </div>
+    <div class="stack-item">
+      <div class="stack-icon">📊</div>
+      <div class="stack-name">Google Sheets</div>
+      <div class="stack-role">Data logging</div>
+    </div>
+    <div class="stack-item">
+      <div class="stack-icon">📧</div>
+      <div class="stack-name">Gmail</div>
+      <div class="stack-role">Lead Delivery System</div>
+    </div>
+    <div class="stack-item">
+      <div class="stack-icon">🐍</div>
+      <div class="stack-name">Python</div>
+      <div class="stack-role">Custom Logic & ML</div>
+    </div>
+    <div class="stack-item">
+      <div class="stack-icon">🔄</div>
+      <div class="stack-name">N8N</div>
+      <div class="stack-role">Advanced Workflow Automation</div>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer style="padding:48px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:24px;border-top:1px solid var(--border)">
+  <div class="footer-brand">Algorithm <span>Athlete</span> ⚡</div>
+  <div class="footer-links">
+    <a href="https://algorithmathlete.netlify.app" target="_blank">Main Site</a>
+    <a href="/cdn-cgi/l/email-protection#8ee1e2efe2ebfcebefeaebe5fbe0e2ebbcbebeb6cee9e3efe7e2a0ede1e3">Request a Technical Demo</a>
+  </div>
+</footer>
+
+<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-stati
