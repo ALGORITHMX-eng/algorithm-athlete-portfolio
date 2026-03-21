@@ -44,7 +44,7 @@
 
   body::before {
     content: '';
-    position: fixed;
+    position: fixed;            
     inset: 0;
     background: repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0,0,0,0.08) 2px, rgba(0,0,0,0.08) 4px);
     pointer-events: none;
@@ -601,4 +601,15 @@
       }
     });
   }, { threshold: 0.1 });
-  reveals.forEach(e
+  reveals.forEach(el => observer.observe(el));
+
+  document.querySelectorAll('a[href^="#"]').forEach(a => {
+    a.addEventListener('click', e => {
+      e.preventDefault();
+      document.querySelector(a.getAttribute('href'))?.scrollIntoView({ behavior: 'smooth' });
+    });
+  });
+</script>
+
+</body>
+</html>
