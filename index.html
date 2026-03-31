@@ -565,8 +565,7 @@
     <div id="aa-footer"><span>AA Personal Assistant &middot; RAG + Groq AI</span></div>
   </div>
 </div>
-
-<script>
+  <script>
   function openModal() { document.getElementById("demoModal").classList.add("open"); document.body.style.overflow="hidden"; }
   function closeModal() { document.getElementById("demoModal").classList.remove("open"); document.body.style.overflow=""; }
   function closeModalOutside(e) { if(e.target===document.getElementById("demoModal")) closeModal(); }
@@ -576,13 +575,50 @@
   var observer=new IntersectionObserver(function(entries){ entries.forEach(function(entry,i){ if(entry.isIntersecting){ setTimeout(function(){ entry.target.classList.add("visible"); },i*100); observer.unobserve(entry.target); } }); },{ threshold:0.1 });
   reveals.forEach(function(el){ observer.observe(el); });
   document.querySelectorAll("a[href^='#']").forEach(function(a){ a.addEventListener("click",function(e){ var href=a.getAttribute("href"); if(href==="#"||!document.querySelector(href)) return; e.preventDefault(); document.querySelector(href).scrollIntoView({behavior:"smooth"}); }); });
+
   var AA_API="https://web-production-16785.up.railway.app/ask";
   var aaOpen=false;
   var aaTyping=false;
+  var AA_LIMIT=5;
+  var AA_KEY="aa_query_count";
+
+  function aaGetCount(){ return parseInt(localStorage.getItem(AA_KEY)||"0",10); }
+  function aaIncrCount(){ localStorage.setItem(AA_KEY, aaGetCount()+1); }
+  function aaLimitReached(){ return aaGetCount()>=AA_LIMIT; }
+
   function aaToggle(){ aaOpen=!aaOpen; document.getElementById("aa-window").classList.toggle("open",aaOpen); document.getElementById("aa-fab").classList.toggle("open",aaOpen); if(aaOpen){ document.getElementById("aa-ping").style.display="none"; setTimeout(function(){ document.getElementById("aa-input").focus(); },300); } }
   function aaQuick(q){ document.getElementById("aa-quick").style.display="none"; aaAddMsg(q,"user"); aaFetch(q); }
   function aaSend(){ var input=document.getElementById("aa-input"); var val=input.value.trim(); if(!val||aaTyping) return; input.value=""; document.getElementById("aa-quick").style.display="none"; aaAddMsg(val,"user"); aaFetch(val); }
-  function aaFetch(question){ aaTyping=true; document.getElementById("aa-send").disabled=true; aaShowTyping(); fetch(AA_API,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({question:question})}).then(function(r){ return r.json(); }).then(function(data){ aaRemoveTyping(); aaTyping=false; document.getElementById("aa-send").disabled=false; aaAddMsg(data.answer||"Could not get a response. Try again.","bot"); }).catch(function(){ aaRemoveTyping(); aaTyping=false; document.getElementById("aa-send").disabled=false; aaAddMsg("Connection error. API may be starting up &mdash; try again in a moment.","bot"); }); }
+
+  function aaFetch(question){
+    if(aaLimitReached()){
+      aaAddMsg("You've reached the 5-query limit. To continue the conversation, reach out directly at olalereadekunle2008@gmail.com ⚡","bot");
+      aaLockInput();
+      return;
+    }
+    aaIncrCount();
+    var remaining = AA_LIMIT - aaGetCount();
+    aaTyping=true;
+    document.getElementById("aa-send").disabled=true;
+    aaShowTyping();
+    fetch(AA_API,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({question:question})}).then(function(r){ return r.json(); }).then(function(data){
+      aaRemoveTyping(); aaTyping=false; document.getElementById("aa-send").disabled=false;
+      aaAddMsg(data.answer||"Could not get a response. Try again.","bot");
+      if(aaLimitReached()){ aaLockInput(); }
+      else { aaAddMsg("("+remaining+" "+(remaining===1?"query":"queries")+" remaining)","bot"); }
+    }).catch(function(){
+      aaRemoveTyping(); aaTyping=false; document.getElementById("aa-send").disabled=false;
+      aaAddMsg("Connection error. API may be starting up — try again in a moment.","bot");
+    });
+  }
+
+  function aaLockInput(){
+    var input=document.getElementById("aa-input");
+    input.disabled=true;
+    input.placeholder="Query limit reached — email to continue ⚡";
+    document.getElementById("aa-send").disabled=true;
+  }
+
   function aaAddMsg(text,type){ var msgs=document.getElementById("aa-messages"); var now=new Date().toLocaleTimeString([],{hour:"2-digit",minute:"2-digit"}); var div=document.createElement("div"); div.className="aa-msg "+type; div.innerHTML='<div class="aa-bubble">'+text+'</div><div class="aa-time">'+now+"</div>"; msgs.appendChild(div); msgs.scrollTop=msgs.scrollHeight; }
   function aaShowTyping(){ var msgs=document.getElementById("aa-messages"); var div=document.createElement("div"); div.className="aa-msg bot"; div.id="aa-typing-indicator"; div.innerHTML='<div class="aa-typing"><span></span><span></span><span></span></div>'; msgs.appendChild(div); msgs.scrollTop=msgs.scrollHeight; }
   function aaRemoveTyping(){ var el=document.getElementById("aa-typing-indicator"); if(el) el.remove(); }
