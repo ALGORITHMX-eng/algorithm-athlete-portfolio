@@ -576,7 +576,7 @@
   reveals.forEach(function(el){ observer.observe(el); });
   document.querySelectorAll("a[href^='#']").forEach(function(a){ a.addEventListener("click",function(e){ var href=a.getAttribute("href"); if(href==="#"||!document.querySelector(href)) return; e.preventDefault(); document.querySelector(href).scrollIntoView({behavior:"smooth"}); }); });
 
-  var AA_API="https://web-production-16785.up.railway.app/ask";
+  var AA_API="https://ai-portfolio-assistant-wqn5.onrender.com/ask";
   var aaOpen=false;
   var aaTyping=false;
   var AA_LIMIT=5;
